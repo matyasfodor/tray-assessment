@@ -1,7 +1,10 @@
 import React from "react";
+
 import styled from "styled-components";
 
 import Timer from "./Timer";
+import Main from "./Main";
+import { TrayEventProvider } from "./TrayEventEmitter";
 
 const Header = styled.header`
   display: flex;
@@ -10,15 +13,15 @@ const Header = styled.header`
 
 function App() {
   return (
-    <div>
+    <TrayEventProvider>
       <Header>
         <p>Matyas's visualizer</p>
         <p>
           <Timer />
         </p>
       </Header>
-      <main></main>
-    </div>
+      <Main />
+    </TrayEventProvider>
   );
 }
 
