@@ -9,6 +9,7 @@ TODO:
 - [ ] Integrate EventEmmitter
   - [ ] Check typings, add if required
 - [ ] Build visualizer SVG map (?)
+  - SVG doesn't support drag and drop: https://github.com/facebook/react/issues/3192
 - [ ] Add interesting connectors
 - [ ] Extend README.md
 - [ ] Deploy to github pages / netlify

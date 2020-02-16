@@ -1,28 +1,18 @@
 import React from "react";
 
 import { withEventEmitter, ITrayContext } from "./TrayEventEmitter";
+import { Visualizer } from "./Visualizer";
+import InterestingVisualizer from "./InterestingVisualizer";
 
-interface ITrayOBject {
-  coords?: {
-    x: number;
-    y: number;
-  };
-  connector?: {
-    iconURL: string;
-    name: string;
-  };
-  trayTrollSays: string;
-}
-
-const Main: React.FC<ITrayContext> = (
-  props: ITrayContext
-): React.ReactElement => (
+const Main: React.FC<ITrayContext> = ({
+  trayObjects
+}: ITrayContext): React.ReactElement => (
   <main>
     {/* TODO */}
-    <div>Visualizer</div>
-    <pre>{JSON.stringify(props, undefined, 2)}</pre>
+    {/* <div>Visualizer</div> */}
+    <Visualizer trayObjects={trayObjects} />
     {/* TODO */}
-    <div>Interesting connector</div>
+    <InterestingVisualizer />
   </main>
 );
 

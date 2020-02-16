@@ -19,7 +19,8 @@ interface ITrayObjectRaw {
   trayTrollSays: string;
 }
 
-interface ITrayObject {
+export interface ITrayObject {
+  id: string;
   coords: {
     x: number;
     y: number;
@@ -38,6 +39,10 @@ const { Provider, Consumer } = React.createContext<ITrayContext>({
   trayObjects: []
 });
 
+const uniqueId = (): string => {
+  return `id_${new Date().getTime()}`;
+};
+
 type IProps = PropsWithChildren<{ "data-tray": ITrayObjectRaw }>;
 
 const EventEmitterInner: React.FC<IProps> = ({
@@ -52,9 +57,12 @@ const EventEmitterInner: React.FC<IProps> = ({
       // insufficient data
       return;
     }
+
+    const id = uniqueId();
+
     setTrayObjects(prevTrayObjects => [
       ...prevTrayObjects,
-      { coords, connector }
+      { coords, connector, id }
     ]);
   }, [incomingData]);
   return <Provider value={{ trayObjects }}>{children}</Provider>;
