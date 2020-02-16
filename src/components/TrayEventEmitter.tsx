@@ -33,10 +33,14 @@ export interface ITrayObject {
 
 export interface ITrayContext {
   trayObjects: ITrayObject[];
+  interestingTrayObjects: ITrayObject[];
+  setInteresting: (id: string) => void;
 }
 
 const { Provider, Consumer } = React.createContext<ITrayContext>({
-  trayObjects: []
+  trayObjects: [],
+  interestingTrayObjects: [],
+  setInteresting: () => null
 });
 
 const uniqueId = (): string => {
@@ -50,6 +54,30 @@ const EventEmitterInner: React.FC<IProps> = ({
   "data-tray": incomingData
 }: IProps): React.ReactElement | null => {
   const [trayObjects, setTrayObjects] = useState<ITrayObject[]>([]);
+  const [interestingTrayObjects, setInterestingTrayObjects] = useState<
+    ITrayObject[]
+  >([]);
+
+  const normalize = (coord: number): number => {
+    // Incoming data is actually in the range: -100 .. 1100
+    return (coord + 100) * (1000 / 1200);
+  };
+
+  const setInteresting = (interestingId: string) => {
+    const interestingObject = trayObjects.find(
+      ({ id }) => id === interestingId
+    );
+    if (!interestingObject) {
+      throw new Error("Unknown object");
+    }
+    setInterestingTrayObjects(prevInterestingTrayObjects => [
+      ...prevInterestingTrayObjects,
+      interestingObject
+    ]);
+    setTrayObjects(prevTrayObjects =>
+      prevTrayObjects.filter(({ id }) => id !== interestingId)
+    );
+  };
 
   useEffect(() => {
     const { coords, connector } = incomingData;
@@ -58,14 +86,27 @@ const EventEmitterInner: React.FC<IProps> = ({
       return;
     }
 
+    const { x, y } = coords;
+
     const id = uniqueId();
 
     setTrayObjects(prevTrayObjects => [
       ...prevTrayObjects,
-      { coords, connector, id }
+      {
+        coords: {
+          x: normalize(x),
+          y: normalize(y)
+        },
+        connector,
+        id
+      }
     ]);
   }, [incomingData]);
-  return <Provider value={{ trayObjects }}>{children}</Provider>;
+  return (
+    <Provider value={{ trayObjects, interestingTrayObjects, setInteresting }}>
+      {children}
+    </Provider>
+  );
 };
 
 export const TrayEventProvider: React.FC = ({
@@ -81,12 +122,17 @@ export const TrayEventProvider: React.FC = ({
 export const withEventEmitter = <P extends PropsWithChildren<ITrayContext>>(
   ComponentToWrap: ComponentType<P>
 ) => {
-  return class ClientComponent extends React.Component<Omit<P, "trayObjects">> {
+  return class ClientComponent extends React.Component<
+    Omit<P, "trayObjects" | "interestingTrayObjects" | "setInteresting">
+  > {
     render() {
       return (
         <Consumer>
-          {({ trayObjects }) => {
-            const props = { ...this.props, trayObjects };
+          {contextProps => {
+            const props = {
+              ...this.props,
+              ...contextProps
+            };
             // @ts-ignore
             return <ComponentToWrap {...props} />;
           }}

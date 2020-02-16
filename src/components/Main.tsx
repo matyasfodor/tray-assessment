@@ -5,15 +5,17 @@ import { Visualizer } from "./Visualizer";
 import InterestingVisualizer from "./InterestingVisualizer";
 
 const Main: React.FC<ITrayContext> = ({
-  trayObjects
+  trayObjects,
+  interestingTrayObjects,
+  setInteresting
 }: ITrayContext): React.ReactElement => (
-  <main>
-    {/* TODO */}
-    {/* <div>Visualizer</div> */}
+  <div>
     <Visualizer trayObjects={trayObjects} />
-    {/* TODO */}
-    <InterestingVisualizer />
-  </main>
+    <InterestingVisualizer
+      onDrop={setInteresting}
+      trayObjects={interestingTrayObjects}
+    />
+  </div>
 );
 
 export default withEventEmitter(Main);
